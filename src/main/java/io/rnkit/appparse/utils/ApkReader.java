@@ -3,11 +3,7 @@ package io.rnkit.appparse.utils;
 import io.rnkit.appparse.entity.ApkInfo;
 import io.rnkit.appparse.entity.ImpliedFeature;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  * Name: ApkReader
@@ -36,18 +32,8 @@ public class ApkReader {
     private ProcessBuilder mBuilder;
     private static final String SPLIT_REGEX = "(: )|(=')|(' )|'";
     private static final String FEATURE_SPLIT_REGEX = "(:')|(',')|'";
-    /**
-     * aapt所在的目录。
-     */
-    private String mAaptPath = null;
 
     public ApkReader() {
-        String osName = System.getProperty("os.name");
-        if (osName.toLowerCase().contains("mac")) {
-            mAaptPath = this.getClass().getResource("/bin/macosx-aapt").getPath();
-        } else if (osName.toLowerCase().contains("linux")) {
-            mAaptPath = this.getClass().getResource("/bin/linux-aapt").getPath();
-        }
         mBuilder = new ProcessBuilder();
         mBuilder.redirectErrorStream(true);
     }
@@ -59,8 +45,11 @@ public class ApkReader {
      * @return apkInfo 一个Apk的信息。
      */
     public ApkInfo getApkInfo(String apkPath) throws Exception {
-        if (mAaptPath == null) throw new Exception("不支持的系统!");
-        Process process = mBuilder.command(mAaptPath, "d", "badging", apkPath)
+
+        CommandUtils commandUtils = new CommandUtils();
+        String commandPath = commandUtils.getCommandPath("aapt");
+
+        Process process = mBuilder.command(commandPath, "d", "badging", apkPath)
                 .start();
         InputStream is = null;
         is = process.getInputStream();
@@ -173,13 +162,5 @@ public class ApkReader {
                 e.printStackTrace();
             }
         }
-    }
-
-    public String getmAaptPath() {
-        return mAaptPath;
-    }
-
-    public void setmAaptPath(String mAaptPath) {
-        this.mAaptPath = mAaptPath;
     }
 }
