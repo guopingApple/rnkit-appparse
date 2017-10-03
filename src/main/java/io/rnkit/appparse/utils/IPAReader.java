@@ -1,24 +1,19 @@
 package io.rnkit.appparse.utils;
 
 import java.io.*;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import io.rnkit.appparse.entity.IPAInfo;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.xml.sax.SAXException;
 
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSObject;
-import com.dd.plist.PropertyListFormatException;
 import com.dd.plist.PropertyListParser;
 
 /**
@@ -31,16 +26,8 @@ import com.dd.plist.PropertyListParser;
 public class IPAReader {
     private String fileName;
 
-    private String mApngdefryPath = null;
-
     public IPAReader(String fileName) {
         this.fileName = fileName;
-        String osName = System.getProperty("os.name");
-        if (osName.toLowerCase().contains("mac")) {
-            mApngdefryPath = this.getClass().getResource("/bin/macosx-pngdefry").getPath();
-        } else if (osName.toLowerCase().contains("linux")) {
-            mApngdefryPath = this.getClass().getResource("/bin/linux-pngdefry").getPath();
-        }
     }
 
     public String getLastIconFileName(NSDictionary dict, String identifier) {
@@ -57,14 +44,12 @@ public class IPAReader {
 
         for (NSObject file : files) {
             name = file.toString();
-            System.out.println(name);
         }
 
         return name;
     }
 
-    public IPAInfo parse() throws IOException, PropertyListFormatException, ParseException, ParserConfigurationException, SAXException {
-//        if (mAaptPath == null) throw new Exception("不支持的系统!");
+    public IPAInfo parse() throws Exception {
         IPAInfo info = new IPAInfo();
 
         File f = new File(this.fileName);
@@ -159,8 +144,10 @@ public class IPAReader {
                     File pngTmpFile = this.writeFileToTmp(zipIn);
                     // 调用 pngdefry 修复图片
                     File pngdefryFile = this.pngdefry(pngTmpFile);
+                    pngTmpFile.delete();
                     // 读取图片
                     FileInputStream fileInputStream = new FileInputStream(pngdefryFile);
+                    pngdefryFile.delete();
                     info.setBundleIcon(IOUtils.toByteArray(fileInputStream));
                     break;
                 }
@@ -209,18 +196,19 @@ public class IPAReader {
         return file;
     }
 
-    private File pngdefry(File pngFile) throws IOException {
+    private File pngdefry(File pngFile) throws Exception {
         ProcessBuilder mBuilder = new ProcessBuilder();
         mBuilder.redirectErrorStream(true);
-        ProcessBuilder processBuilder = mBuilder.command(mApngdefryPath, "-s", "-pngdefry", "-o", pngFile.getParent(), pngFile.getAbsolutePath());
+
+        CommandUtils commandUtils = new CommandUtils();
+        String commandPath = commandUtils.getCommandPath("pngdefry");
+
+        ProcessBuilder processBuilder = mBuilder.command(commandPath, "-s", "-pngdefry", "-o", pngFile.getParent(), pngFile.getAbsolutePath());
         Process process = processBuilder.start();
         InputStream is = process.getInputStream();
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(is, "utf8"));
-        String tmp = br.readLine();
-        System.out.println(tmp);
-        File pngdefryFile = new File(String.format("%s/%s-pngdefry.png", pngFile.getParent(), FilenameUtils.getBaseName(pngFile.getName())));
-        System.out.println(pngdefryFile.getPath());
-        return pngdefryFile;
+        br.readLine();
+        return new File(String.format("%s/%s-pngdefry.png", pngFile.getParent(), FilenameUtils.getBaseName(pngFile.getName())));
     }
 }
