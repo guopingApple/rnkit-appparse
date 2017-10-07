@@ -3,6 +3,8 @@ package io.rnkit.appparse.utils;
 import io.rnkit.appparse.entity.IPAInfo;
 import org.junit.Test;
 
+import java.time.Instant;
+
 import static org.junit.Assert.*;
 
 /**
@@ -15,12 +17,11 @@ import static org.junit.Assert.*;
 public class IPAReaderTest {
     @Test
     public void parse() throws Exception {
-//        String path = "..ipa";
+//        String path = "...ipa";
 //        IPAReader reader = new IPAReader(path);
 //        IPAInfo info = reader.parse();
 //
 //        assertNotNull(info);
 //        assertNotNull(info.getBundleIcon());
     }
-
 }

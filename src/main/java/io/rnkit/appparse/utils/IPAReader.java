@@ -96,6 +96,7 @@ public class IPAReader {
 
                 info.setMinimumOSVersion(rootDict.get("MinimumOSVersion").toString());
                 info.setBundleName(rootDict.get("CFBundleName").toString());
+                info.setBundleDisplayName(rootDict.get("CFBundleDisplayName").toString());
                 info.setBundleVersionString(rootDict.get("CFBundleShortVersionString").toString());
                 info.setBundleIdentifier(rootDict.get("CFBundleIdentifier").toString());
                 info.setBuildNumber(rootDict.get("CFBundleVersion").toString());
@@ -134,7 +135,7 @@ public class IPAReader {
         }
         zipIn.close();
 
-        // 此处需要优化, 可以减少2s左右
+        // 此处需要优化, 可以减少30%左右
         if (info.getBundleIconFileName() != null) {
             zipIn = new ZipInputStream(new FileInputStream(this.fileName));
             entry = zipIn.getNextEntry();
@@ -144,7 +145,7 @@ public class IPAReader {
                     File pngTmpFile = this.writeFileToTmp(zipIn);
                     // 调用 pngdefry 修复图片
                     File pngdefryFile = this.pngdefry(pngTmpFile);
-                    pngTmpFile.delete();
+//                    pngTmpFile.delete();
                     // 读取图片
                     FileInputStream fileInputStream = new FileInputStream(pngdefryFile);
                     pngdefryFile.delete();
@@ -188,11 +189,17 @@ public class IPAReader {
     }
 
     private File writeFileToTmp(ZipInputStream zipInputStream) throws IOException {
+
         String tmpFilePath = String.format("%s/%s.png", System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
         File file = new File(tmpFilePath);
-        OutputStream output = new FileOutputStream(file);
-        BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
-        bufferedOutput.write(readFileToMemory(zipInputStream).toByteArray());
+
+        FileOutputStream fos = new FileOutputStream(file);
+        int chunk = 0;
+        byte[] data = new byte[4096];
+        while (-1 != (chunk = zipInputStream.read(data))) {
+            fos.write(data, 0, chunk);
+        }
+        fos.close();
         return file;
     }
 
@@ -202,13 +209,16 @@ public class IPAReader {
 
         CommandUtils commandUtils = new CommandUtils();
         String commandPath = commandUtils.getCommandPath("pngdefry");
-
         ProcessBuilder processBuilder = mBuilder.command(commandPath, "-s", "-pngdefry", "-o", pngFile.getParent(), pngFile.getAbsolutePath());
         Process process = processBuilder.start();
         InputStream is = process.getInputStream();
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(is, "utf8"));
-        br.readLine();
-        return new File(String.format("%s/%s-pngdefry.png", pngFile.getParent(), FilenameUtils.getBaseName(pngFile.getName())));
+        String tmp = br.readLine();
+        if (tmp.contains("writing to file")) {
+            return new File(String.format("%s/%s-pngdefry.png", pngFile.getParent(), FilenameUtils.getBaseName(pngFile.getName())));
+        } else {
+            return pngFile;
+        }
     }
 }

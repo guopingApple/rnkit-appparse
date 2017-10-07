@@ -15,6 +15,7 @@ public class IPAInfo {
     private String bundleVersionString;
     private String buildNumber;
     private String bundleName;
+    private String bundleDisplayName;
     private String requiredDeviceCapabilities;
     private byte[] bundleIcon;
     private String platformVersion;
@@ -88,6 +89,15 @@ public class IPAInfo {
     public void setBundleName(String bundleName) {
         this.bundleName = bundleName;
     }
+
+    public String getBundleDisplayName() {
+        return bundleDisplayName;
+    }
+
+    public void setBundleDisplayName(String bundleDisplayName) {
+        this.bundleDisplayName = bundleDisplayName;
+    }
+
     public String getRequiredDeviceCapabilities() {
         return requiredDeviceCapabilities;
     }
