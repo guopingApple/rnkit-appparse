@@ -22,14 +22,14 @@ parsing IPA And Apk files
 <dependency>
     <groupId>io.rnkit</groupId>
     <artifactId>appparse</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
 ## Gradle via JCenter
 
 ``` groovy
-compile 'io.rnkit:appparse:1.0.1'
+compile 'io.rnkit:appparse:1.0.3'
 ```
 ### *License*
 

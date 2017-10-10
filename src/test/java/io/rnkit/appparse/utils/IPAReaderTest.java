@@ -3,8 +3,6 @@ package io.rnkit.appparse.utils;
 import io.rnkit.appparse.entity.IPAInfo;
 import org.junit.Test;
 
-import java.time.Instant;
-
 import static org.junit.Assert.*;
 
 /**

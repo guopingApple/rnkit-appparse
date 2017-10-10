@@ -1,6 +1,8 @@
 package io.rnkit.appparse.utils;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Name: CommandUtils
@@ -28,7 +30,8 @@ public class CommandUtils {
     }
 
     public String getCommandPath(String command) throws IOException, InterruptedException {
-        File commandFile = new File(System.getProperty("java.io.tmpdir") + command);
+        Path path = Paths.get(System.getProperty("java.io.tmpdir"), command);
+        File commandFile = new File(path.toString());
         if (!commandFile.exists()) {
             InputStream inputStream = this.getClass().getResourceAsStream(command.equals("pngdefry") ? pngdefryCommandPath : aaptCommandPath);
             OutputStream os = new FileOutputStream(commandFile);

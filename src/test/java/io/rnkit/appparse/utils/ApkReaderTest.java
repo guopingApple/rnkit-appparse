@@ -18,15 +18,15 @@ import static org.junit.Assert.*;
 public class ApkReaderTest {
     @Test
     public void getApkInfo() throws Exception {
-//        String demo = "..apk";
+//        String demo = "...apk";
 //
 //        ApkInfo apkInfo = new ApkReader().getApkInfo(demo);
-////        System.out.println(apkInfo);
+//        System.out.println(apkInfo);
 //        assertNotNull(apkInfo);
 //
 //        String tmpFilePath = String.format("%s/%s.png", System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
 //        IconUtil.extractFileFromApk(demo, IconUtil.getIconMax(apkInfo.getApplicationIcons()), tmpFilePath);
-////        System.out.println(tmpFilePath);
+//        System.out.println(tmpFilePath);
 //        File tmpFile = new File(tmpFilePath);
 //
 //        assertTrue(tmpFile.exists());
